@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Hệ Thống Quy Đổi Tỉ Giá Real-time</title>
+    <title>Em Dy Neso</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.7/themes/odometer-theme-minimal.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.7/odometer.min.js"></script>
@@ -28,7 +28,7 @@
 <div class="w-full max-w-lg space-y-6">
     <div class="text-center space-y-2">
         <h1 class="text-3xl font-extrabold bg-gradient-to-r from-indigo-400 to-emerald-400 bg-clip-text text-transparent">
-            QUY ĐỔI TỈ GIÁ TỰ ĐỘNG
+            Pochita Vjppro
         </h1>
         <p class="text-xs text-slate-500 uppercase tracking-widest" id="status">Đang cập nhật tỉ giá trực tuyến...</p>
     </div>
@@ -38,29 +38,26 @@
 </div>
 
 <script>
-// Cấu hình đơn vị
 const config = [
-    { id: 'NESO', name: 'NESO', icon: 'https://cdn-icons-png.flaticon.com/512/845/845665.png', color: 'text-indigo-400' },
-    { id: 'NXPC', name: 'NXPC', icon: 'https://cryptologos.cc/logos/maplestory-nxpc-logo.png', color: 'text-emerald-400' },
+    { id: 'NESO', name: 'NESO', icon: 'https://dailyneso.com/static/img/logo.png', color: 'text-indigo-400' },
+    { id: 'NXPC', name: 'NXPC', icon: 'https://www.dailyneso.com/static/img/nxpc.png', color: 'text-emerald-400' },
     { id: 'USD', name: 'USD', icon: 'https://cdn-icons-png.flaticon.com/512/197/197484.png', color: 'text-blue-400' },
     { id: 'VND', name: 'VND', icon: 'https://cdn-icons-png.flaticon.com/512/197/197473.png', color: 'text-red-400' }
 ];
 
+    //de phong loi api
 let exchangeRates = {
-    NXPC_USD: 0.27, // Mặc định nếu API lỗi
+    NXPC_USD: 0.27, 
     USD_VND: 25400,
     NESO_NXPC: 100000
 };
 
-// Hàm lấy tỉ giá từ API
 async function fetchRates() {
     try {
-        // 1. Lấy giá NXPC từ Binance (hoặc sàn khác)
         const nxpcRes = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=NXPCUSDT');
         const nxpcData = await nxpcRes.json();
         exchangeRates.NXPC_USD = parseFloat(nxpcData.price);
 
-        // 2. Lấy tỉ giá USD/VND
         const vndRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
         const vndData = await vndRes.json();
         exchangeRates.USD_VND = vndData.rates.VND;
@@ -71,7 +68,6 @@ async function fetchRates() {
     }
 }
 
-// Render giao diện
 const container = document.getElementById('main-container');
 config.forEach(item => {
     container.innerHTML += `
@@ -90,11 +86,10 @@ config.forEach(item => {
     `;
 });
 
-// Logic tính toán
+
 function updateAll(sourceId, value) {
     let nxpcBase = 0;
 
-    // Quy đổi về NXPC làm gốc
     if (sourceId === 'NESO') nxpcBase = value / exchangeRates.NESO_NXPC;
     else if (sourceId === 'NXPC') nxpcBase = value;
     else if (sourceId === 'USD') nxpcBase = value / exchangeRates.NXPC_USD;
@@ -107,12 +102,10 @@ function updateAll(sourceId, value) {
         else if (item.id === 'USD') result = nxpcBase * exchangeRates.NXPC_USD;
         else if (item.id === 'VND') result = nxpcBase * exchangeRates.NXPC_USD * exchangeRates.USD_VND;
 
-        // Cập nhật ô input (trừ ô đang nhập)
         if (item.id !== sourceId) {
             document.getElementById(`input-${item.id}`).value = result.toFixed(item.id === 'VND' ? 0 : 4);
         }
 
-        // Cập nhật hiệu ứng Odometer và phần thập phân mờ
         const integerPart = Math.floor(result);
         const decimalPart = (result - integerPart).toFixed(4).substring(2);
         
@@ -121,7 +114,7 @@ function updateAll(sourceId, value) {
     });
 }
 
-// Gán sự kiện
+
 config.forEach(item => {
     const input = document.getElementById(`input-${item.id}`);
     input.addEventListener('input', (e) => {
@@ -129,7 +122,7 @@ config.forEach(item => {
     });
 });
 
-// Chạy lần đầu
+
 fetchRates();
 </script>
 
