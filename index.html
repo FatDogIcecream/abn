@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Converter Neso</title>
+  <style>
+    body {
+      font-family: Arial;
+      max-width: 500px;
+      margin: 50px auto;
+      text-align: center;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>💱 Neso Converter</h2>
+
+<input id="neso" placeholder="Neso">
+<input id="nxpc" placeholder="NXPC">
+<input id="usd" placeholder="USD">
+<input id="vnd" placeholder="VND">
+
+<script>
+let rate = 26000; 
+
+fetch("https://api.exchangerate-api.com/v4/latest/USD")
+  .then(res => res.json())
+  .then(data => {
+    rate = data.rates.VND;
+  });
+
+function convert(from) {
+  let neso = parseFloat(document.getElementById("neso").value) || 0;
+  let nxpc = parseFloat(document.getElementById("nxpc").value) || 0;
+  let usd = parseFloat(document.getElementById("usd").value) || 0;
+  let vnd = parseFloat(document.getElementById("vnd").value) || 0;
+
+  if (from === "neso") {
+    nxpc = neso / 100000;
+    usd = nxpc * 0.27;
+    vnd = usd * rate;
+  }
+
+  if (from === "nxpc") {
+    neso = nxpc * 100000;
+    usd = nxpc * 0.27;
+    vnd = usd * rate;
+  }
+
+  if (from === "usd") {
+    nxpc = usd / 0.27;
+    neso = nxpc * 100000;
+    vnd = usd * rate;
+  }
+
+  if (from === "vnd") {
+    usd = vnd / rate;
+    nxpc = usd / 0.27;
+    neso = nxpc * 100000;
+  }
+
+  document.getElementById("neso").value = neso || "";
+  document.getElementById("nxpc").value = nxpc || "";
+  document.getElementById("usd").value = usd || "";
+  document.getElementById("vnd").value = vnd || "";
+}
+
+["neso","nxpc","usd","vnd"].forEach(id => {
+  document.getElementById(id).addEventListener("input", () => convert(id));
+});
+</script>
+
+</body>
