@@ -1,46 +1,99 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Converter Neso</title>
-  <style>
-    body {
-      font-family: Arial;
-      max-width: 500px;
-      margin: 50px auto;
-      text-align: center;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 16px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Neso Converter</title>
+
+<style>
+body {
+  font-family: Arial;
+  max-width: 500px;
+  margin: 50px auto;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  margin: 12px 0;
+  gap: 10px;
+}
+
+.row img {
+  width: 28px;
+  height: 28px;
+}
+
+.label {
+  width: 60px;
+  font-weight: bold;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+}
+
+/* phần số thập phân mờ */
+.dim {
+  color: #aaa;
+}
+</style>
 </head>
+
 <body>
 
 <h2>💱 Neso Converter</h2>
 
-<input id="neso" placeholder="Neso">
-<input id="nxpc" placeholder="NXPC">
-<input id="usd" placeholder="USD">
-<input id="vnd" placeholder="VND">
+<div class="row">
+  <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+  <div class="label">NESO</div>
+  <input id="neso">
+</div>
+
+<div class="row">
+  <img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png">
+  <div class="label">NXPC</div>
+  <input id="nxpc">
+</div>
+
+<div class="row">
+  <img src="https://cdn-icons-png.flaticon.com/512/3135/3135706.png">
+  <div class="label">USD</div>
+  <input id="usd">
+</div>
+
+<div class="row">
+  <img src="https://cdn-icons-png.flaticon.com/512/1490/1490853.png">
+  <div class="label">VND</div>
+  <input id="vnd">
+</div>
 
 <script>
-let rate = 26000; 
+let rate = 25000;
 
+// lấy tỷ giá
 fetch("https://api.exchangerate-api.com/v4/latest/USD")
   .then(res => res.json())
-  .then(data => {
-    rate = data.rates.VND;
-  });
+  .then(data => rate = data.rates.VND);
 
+// format kiểu 100.209,0398
+function formatNumber(num) {
+  if (!num) return "";
+
+  let parts = num.toFixed(4).split(".");
+  let intPart = Number(parts[0]).toLocaleString("de-DE"); // dùng . ngăn cách
+  let decimal = parts[1];
+
+  return intPart + "," + decimal;
+}
+
+// convert
 function convert(from) {
-  let neso = parseFloat(document.getElementById("neso").value) || 0;
-  let nxpc = parseFloat(document.getElementById("nxpc").value) || 0;
-  let usd = parseFloat(document.getElementById("usd").value) || 0;
-  let vnd = parseFloat(document.getElementById("vnd").value) || 0;
+  let neso = parseFloat(nesoInput.value) || 0;
+  let nxpc = parseFloat(nxpcInput.value) || 0;
+  let usd = parseFloat(usdInput.value) || 0;
+  let vnd = parseFloat(vndInput.value) || 0;
 
   if (from === "neso") {
     nxpc = neso / 100000;
@@ -66,15 +119,23 @@ function convert(from) {
     neso = nxpc * 100000;
   }
 
-  document.getElementById("neso").value = neso || "";
-  document.getElementById("nxpc").value = nxpc || "";
-  document.getElementById("usd").value = usd || "";
-  document.getElementById("vnd").value = vnd || "";
+  nesoInput.value = formatNumber(neso);
+  nxpcInput.value = formatNumber(nxpc);
+  usdInput.value = formatNumber(usd);
+  vndInput.value = formatNumber(vnd);
 }
 
-["neso","nxpc","usd","vnd"].forEach(id => {
-  document.getElementById(id).addEventListener("input", () => convert(id));
-});
+const nesoInput = document.getElementById("neso");
+const nxpcInput = document.getElementById("nxpc");
+const usdInput = document.getElementById("usd");
+const vndInput = document.getElementById("vnd");
+
+nesoInput.addEventListener("input", () => convert("neso"));
+nxpcInput.addEventListener("input", () => convert("nxpc"));
+usdInput.addEventListener("input", () => convert("usd"));
+vndInput.addEventListener("input", () => convert("vnd"));
+
 </script>
 
 </body>
+</html>
